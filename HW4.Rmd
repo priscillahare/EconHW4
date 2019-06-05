@@ -1,0 +1,67 @@
+---
+title: "Untitled"
+author: "Priscilla Hare"
+date: "5/31/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+mc_data <- read_csv('HW4Data.csv')
+```
+
+```{r}
+a <- lm(Abatement ~ MC_A, data = mc_data)
+b <- lm(Abatement ~ MC_B, data = mc_data)
+c <- lm(Abatement ~ MC_C, data = mc_data)
+d <- lm(Abatement ~ MC_D, data = mc_data)
+
+```
+
+```{r}
+
+mc_data <- mc_data %>% 
+  mutate(MC_C_sq = MC_C*MC_C)
+
+```
+
+```{r}
+#example of quadratic model:
+c_sq <- lm(Abatement ~ MC_C + MC_C_sq, data = mc_data)
+
+
+```
+
+```{r}
+
+ggplot(mc_data) +
+  geom_point(aes(Abatement, MC_A)) +
+  geom_smooth(aes(Abatement, MC_A), method = lm)
+
+```
+
+Question 2: Finding Demand
+```{r}
+#Sector A
+
+# MC = Int + MC_A*X 
+
+cp_A <- 180
+
+MC_A_cp <- a$coefficients[1] + a$coefficients[2] * cp_A
+
+D_slope_A <- (MC_A_cp/(-cp_A))
+
+# so demand for A = D_slope_A * X
+
+ 
+
+```
+
