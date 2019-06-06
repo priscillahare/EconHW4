@@ -28,13 +28,17 @@ d <- lm(Abatement ~ MC_D, data = mc_data)
 ```{r}
 
 mc_data <- mc_data %>% 
-  mutate(MC_C_sq = MC_C*MC_C)
+  mutate(MC_C_sq = MC_C*MC_C) %>% 
+  mutate(MC_D_sq = MC_D*MC_D) %>% 
+  mutate(MC_D_exp = exp(MC_D))
 
 ```
 
 ```{r}
 #example of quadratic model:
 c_sq <- lm(Abatement ~ MC_C + MC_C_sq, data = mc_data)
+
+d_sq <- lm(Abatement ~ MC_D + MC_D_sq, data = mc_data) #use linear
 
 
 ```
@@ -59,9 +63,107 @@ MC_A_cp <- a$coefficients[1] + a$coefficients[2] * cp_A
 
 D_slope_A <- (MC_A_cp/(-cp_A))
 
-# so demand for A = D_slope_A * X
+demand_A <- function(x){MC_A_cp + D_slope_A * x}
+
+supply_A <- function(x){a$coefficients[1] + a$coefficients[2] * x}
 
  
+
+```
+
+```{r}
+#Sector B
+
+# MC = Int + MC_B*X 
+
+cp_B <- 200
+
+MC_B_cp <- b$coefficients[1] + b$coefficients[2] * cp_B
+
+D_slope_B <- (MC_B_cp/(-cp_B))
+
+supply_B <- function(x){b$coefficients[1] + b$coefficients[2] * x}
+
+# so demand for B = MC_B_cp + D_slope_B * X
+```
+
+```{r}
+#Sector C
+
+# MC = Int + MC_C*X 
+
+cp_C <- 220
+
+MC_C_cp <- c$coefficients[1] + c$coefficients[2] * cp_C
+
+D_slope_C <- (MC_C_cp/(-cp_C))
+
+supply_C <- function(x){c$coefficients[1] + c$coefficients[2] * x}
+
+
+
+# so demand for C = MC_C_cp + D_slope_C * X
+```
+
+
+```{r}
+#Sector D
+
+# MC = Int + MC_D*X 
+
+cp_D <- 300
+
+MC_D_cp <- d$coefficients[1] + d$coefficients[2] * cp_D
+
+D_slope_D <- (MC_D_cp/(-cp_D))
+
+supply_D <- function(x){d$coefficients[1] + d$coefficients[2] * x}
+
+# so demand for D = MC_D_CP + D_slope_D * X
+```
+
+#Part 3
+a) Cap on carbon: each sector cut by 100
+```{r}
+# sector A: 180 to 80
+# sector B; 200 to 100
+# sector C; 220 to 120
+
+TC_A_cap <- integrate(supply_A, 0, 100)
+TC_B_cap <- integrate(supply_B, 0, 100)
+TC_C_cap <- integrate(supply_C, 0, 100)
+
+TC_A_cap$value # 9927.615
+TC_B_cap$value # 14846.63
+TC_C_cap$value # 7820.251
+
+TC_country_cap <- TC_A_cap$value + TC_B_cap$value + TC_C_cap$value
+
+TC_country_cap # 32594.49
+
+# no tax revenue generated
+
+```
+b) Tax on carbon
+```{r}
+# first rearrange supply curves
+
+
+A_rearrange <- function(y){(1/a$coefficients[2])*(-a$coefficients[1] + y)}
+
+B_rearrange <- function(y){(1/b$coefficients[2])*(-b$coefficients[1] + y)}
+
+C_rearrange <- function(y){(1/c$coefficients[2])*(-c$coefficients[1] + y)}
+
+ag_intercept <- (-a$coefficients[1]/a$coefficients[2]) + (-b$coefficients[1]/b$coefficients[2]) + (-c$coefficients[1]/c$coefficients[2])
+
+ag_slope <- (1/a$coefficients[2]) + (1/b$coefficients[2]) + (1/c$coefficients[2])
+
+ag_supply_country_X <- function(x){(-ag_intercept/ag_slope) + (x/ag_slope)}
+
+taxprice <- ag_supply_country_X(300)
+
+A_rearrange(taxprice) + B_rearrange(taxprice) + C_rearrange(taxprice)
 
 ```
 
