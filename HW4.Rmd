@@ -18,10 +18,10 @@ mc_data <- read_csv('HW4Data.csv')
 ```
 
 ```{r}
-a <- lm(Abatement ~ MC_A, data = mc_data)
-b <- lm(Abatement ~ MC_B, data = mc_data)
-c <- lm(Abatement ~ MC_C, data = mc_data)
-d <- lm(Abatement ~ MC_D, data = mc_data)
+a <- lm(MC_A ~ Abatement, data = mc_data)
+b <- lm(MC_B ~ Abatement, data = mc_data)
+c <- lm(MC_C ~ Abatement, data = mc_data)
+d <- lm(MC_D ~ Abatement, data = mc_data)
 
 ```
 
@@ -133,13 +133,13 @@ TC_A_cap <- integrate(supply_A, 0, 100)
 TC_B_cap <- integrate(supply_B, 0, 100)
 TC_C_cap <- integrate(supply_C, 0, 100)
 
-TC_A_cap$value # 9927.615
-TC_B_cap$value # 14846.63
-TC_C_cap$value # 7820.251
+TC_A_cap$value # 2019.762
+TC_B_cap$value # 1925.491
+TC_C_cap$value # 2753.63
 
 TC_country_cap <- TC_A_cap$value + TC_B_cap$value + TC_C_cap$value
 
-TC_country_cap # 32594.49
+TC_country_cap # 6698.883
 
 # no tax revenue generated
 
@@ -155,6 +155,8 @@ B_rearrange <- function(y){(1/b$coefficients[2])*(-b$coefficients[1] + y)}
 
 C_rearrange <- function(y){(1/c$coefficients[2])*(-c$coefficients[1] + y)}
 
+#ag_supply_country_X2 <- function(y){A_rearrange(y) + B_rearrange(y) + C_rearrange(y)}
+
 ag_intercept <- (-a$coefficients[1]/a$coefficients[2]) + (-b$coefficients[1]/b$coefficients[2]) + (-c$coefficients[1]/c$coefficients[2])
 
 ag_slope <- (1/a$coefficients[2]) + (1/b$coefficients[2]) + (1/c$coefficients[2])
@@ -164,6 +166,57 @@ ag_supply_country_X <- function(x){(-ag_intercept/ag_slope) + (x/ag_slope)}
 taxprice <- ag_supply_country_X(300)
 
 A_rearrange(taxprice) + B_rearrange(taxprice) + C_rearrange(taxprice)
+
+A_abate <- A_rearrange(taxprice) # 83.33489 
+B_abate <- B_rearrange(taxprice) # 151.4956
+C_abate <- C_rearrange(taxprice) # 65.16953 
+
+A_tax_abatementcost <- integrate(supply_A, lower = 0, upper = A_abate) 
+
+TC_A_tax <- A_tax_abatementcost$value + (cp_A - A_abate)*taxprice   
+#  5093.786 
+
+B_tax_abatementcost <- integrate(supply_B, lower = 0, upper = B_abate) 
+
+TC_B_tax <- B_tax_abatementcost$value + (cp_B - B_abate)*taxprice   
+#  5604.635 
+
+C_tax_abatementcost <- integrate(supply_C, lower = 0, upper = C_abate) 
+
+TC_C_tax <- C_tax_abatementcost$value + (cp_C - C_abate)*taxprice   
+#  7009.365  
+
+TC_country_tax <- TC_C_tax + TC_B_tax + TC_A_tax
+#  17707.79
+
+#tax revenue generated
+
+tax_rev <- (cp_A - A_abate)*taxprice + (cp_B - B_abate)*taxprice  + (cp_C - C_abate)*taxprice 
+#  11827.97 
+
+```
+
+c) cap and trade
+```{r}
+
+TC_A_captrade <- A_tax_abatementcost$value + (100 - A_abate)*taxprice
+# 1939.66
+
+TC_B_captrade <- B_tax_abatementcost$value + (100 - B_abate)*taxprice
+#  1661.977
+
+TC_C_captrade <- C_tax_abatementcost$value + (100 - C_abate)*taxprice
+#  2278.176 
+
+TC_country_captrade <- TC_A_captrade + TC_B_captrade + TC_C_captrade
+#  5879.812 
+
+# no tax revenue
+
+```
+
+# part 4
+```{r}
 
 ```
 
