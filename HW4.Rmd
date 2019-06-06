@@ -220,3 +220,99 @@ TC_country_captrade <- TC_A_captrade + TC_B_captrade + TC_C_captrade
 
 ```
 
+```{r}
+# first rearrange supply curves
+
+
+A_rearrange <- function(y){(1/a$coefficients[2])*(-a$coefficients[1] + y)}
+
+B_rearrange <- function(y){(1/b$coefficients[2])*(-b$coefficients[1] + y)}
+
+C_rearrange <- function(y){(1/c$coefficients[2])*(-c$coefficients[1] + y)}
+
+D_rearrange <- function(y){(1/d$coefficients[2])*(-d$coefficients[1] + y)}
+
+#ag_supply_country_X2 <- function(y){A_rearrange(y) + B_rearrange(y) + C_rearrange(y)}
+
+ag_intercept_inter <- (-a$coefficients[1]/a$coefficients[2]) + (-b$coefficients[1]/b$coefficients[2]) + (-c$coefficients[1]/c$coefficients[2]) + (-d$coefficients[1]/d$coefficients[2])
+
+ag_slope_inter <- (1/a$coefficients[2]) + (1/b$coefficients[2]) + (1/c$coefficients[2]) + (1/d$coefficients[2])
+
+ag_supply_country_X_Y <- function(x){(-ag_intercept_inter/ag_slope_inter) + (x/ag_slope_inter)}
+
+taxprice_inter <- ag_supply_country_X_Y(300)
+
+A_rearrange(taxprice_inter) + B_rearrange(taxprice_inter) + C_rearrange(taxprice_inter) + D_rearrange(taxprice_inter)
+
+A_abate_inter <- A_rearrange(taxprice_inter) # 66.65079 
+B_abate_inter <- B_rearrange(taxprice_inter) # 103.0711
+C_abate_inter <- C_rearrange(taxprice_inter) #  52.89119  
+D_abate_inter <- D_rearrange(taxprice_inter) # 77.3869 
+
+
+A_tax_abatementcost_inter <- integrate(supply_A, lower = 0, upper = A_abate_inter) 
+
+#TC_A_tax_inter <- A_tax_abatementcost_inter$value + (cp_A - A_abate_inter)*taxprice_inter  
+#  4083.188 
+
+B_tax_abatementcost_inter <- integrate(supply_B, lower = 0, upper = B_abate_inter) 
+
+#TC_B_tax_inter <- B_tax_abatementcost_inter$value + (cp_B - B_abate_inter)*taxprice_inter   
+#  4904.803 
+
+C_tax_abatementcost_inter <- integrate(supply_C, lower = 0, upper = C_abate_inter) 
+
+#TC_C_tax_inter <- C_tax_abatementcost_inter$value + (cp_C - C_abate_inter)*taxprice_inter   
+#   5460.18 
+
+#TC_country_X_tax_inter <- TC_C_tax_inter + TC_B_tax_inter + TC_A_tax_inter
+#   14448.17 
+
+D_abatementcost_inter <- integrate(supply_D, lower = 0, upper = D_abate_inter) 
+
+
+
+```
+
+
+```{r}
+
+TC_A_captrade_inter <- A_tax_abatementcost_inter$value + (100 - A_abate_inter)*taxprice_inter
+#  1698.989 
+
+TC_B_captrade_inter <- B_tax_abatementcost_inter$value + (100 - B_abate_inter)*taxprice_inter
+#  1924.554 
+
+TC_C_captrade_inter <- C_tax_abatementcost_inter$value + (100 - C_abate_inter)*taxprice_inter
+# 1883.88 
+
+TC_D_captrade_inter <- D_abatementcost_inter$value + (0 - D_abate_inter)*taxprice_inter
+# -778.3183 
+
+
+TC_country_X_captradeinter <- TC_A_captrade_inter + TC_B_captrade_inter + TC_C_captrade_inter
+#  5507.423 
+# the value for country x is a lower cost then under cap and trade for just their country
+
+# no tax revenue
+```
+
+5b
+```{r}
+
+A_emissions <- cp_A - A_abate_inter
+B_emissions <- cp_B - B_abate_inter
+C_emissions <- cp_C - C_abate_inter
+
+X_emissions <-A_emissions + B_emissions + C_emissions
+#  377.3869 
+Y_emissions <- 300 - D_abate_inter
+#  222.6131 
+
+```
+
+5c
+```{r}
+
+```
+
