@@ -49,6 +49,8 @@ ggplot(mc_data) +
   geom_point(aes(Abatement, MC_A)) +
   geom_smooth(aes(Abatement, MC_A), method = lm)
 
+
+
 ```
 
 Question 2: Finding Demand
@@ -82,6 +84,8 @@ MC_B_cp <- b$coefficients[1] + b$coefficients[2] * cp_B
 
 D_slope_B <- (MC_B_cp/(-cp_B))
 
+demand_B <- function(x){MC_B_cp + D_slope_B * x}
+
 supply_B <- function(x){b$coefficients[1] + b$coefficients[2] * x}
 
 # so demand for B = MC_B_cp + D_slope_B * X
@@ -97,6 +101,8 @@ cp_C <- 220
 MC_C_cp <- c$coefficients[1] + c$coefficients[2] * cp_C
 
 D_slope_C <- (MC_C_cp/(-cp_C))
+
+demand_C <- function(x){MC_C_cp + D_slope_C * x}
 
 supply_C <- function(x){c$coefficients[1] + c$coefficients[2] * x}
 
@@ -117,9 +123,39 @@ MC_D_cp <- d$coefficients[1] + d$coefficients[2] * cp_D
 
 D_slope_D <- (MC_D_cp/(-cp_D))
 
+demand_D <- function(x){MC_D_cp + D_slope_D * x}
+
 supply_D <- function(x){d$coefficients[1] + d$coefficients[2] * x}
 
 # so demand for D = MC_D_CP + D_slope_D * X
+```
+
+Plot of supply curves
+```{r}
+ggplot(data.frame(x = c(0, 300)), aes(x = x)) +
+  stat_function(fun = supply_A, aes(color = "MC A")) +
+  stat_function(fun = supply_B, aes(color = "MC B")) +
+  stat_function(fun = supply_C, aes(color = "MC C")) +
+  stat_function(fun = supply_D, aes(color = "MC D")) +
+  theme_classic() +
+  labs(x = "Abatement", y = "Price ($)") +
+  scale_y_continuous(expand = c(0,0)) +
+  scale_x_continuous(expand = c(0,0), breaks = seq(0,300, by = 25), limits = c(0,320)) +
+  theme(legend.title=element_blank())
+```
+
+plot of demand curves
+```{r}
+ggplot(data.frame(x = c(0, 300)), aes(x = x)) +
+  stat_function(fun = demand_A, aes(color = "MB A")) +
+  stat_function(fun = demand_B, aes(color = "MB B")) +
+  stat_function(fun = demand_C, aes(color = "MB C")) +
+  stat_function(fun = demand_D, aes(color = "MB D")) +
+  theme_classic() +
+  labs(x = "Abatement", y = "Price ($)") +
+  scale_y_continuous(expand = c(0,0), limits = c(0,170)) +
+  scale_x_continuous(expand = c(0,0), breaks = seq(0,300, by = 25), limits = c(0,320)) +
+  theme(legend.title=element_blank())
 ```
 
 #Part 3
